@@ -129,6 +129,56 @@ TEMPLATES = [
     },
 ]
 
+LOGGING = {
+    "version":1,
+    "disable_existing_loggers":False,
+    "formatters":
+        {
+           "verbose":{
+               "format":"[asctime] {levelname} {name} {process:d} {thread:d} {message}",
+               "style":"{"
+           },
+           "simple": {
+               "format":"{levelname} {asctime} {module} {message}",
+               "style":"{"
+           },
+           
+        },
+    "handlers":
+        {
+            "console":{
+                "class" : "logging.StreamHandler",
+                "formatter" : "verbose" if not DEBUG else "simple",
+                
+            }
+                
+        },
+    "root":{
+        "handlers":["console"],
+        "level":"INFO",
+    },
+    "loggers":{
+        "django":{
+            "handlers":["console"],
+            "level": env("DJANGO_LOG_LEVEL",default="INFO"),
+            "propagate":False,
+        }
+        ,
+        "django.db.backends":{
+            "handlers":["console"],
+            "level":"Warning",
+             "propagate":False,
+        },
+        "orderflow" : {
+            "handlers":["console"],
+            "level":"DEBUG" if DEBUG else "INFO",
+            "propagate":False,
+        }
+    }
+        
+        
+}
+
 WSGI_APPLICATION = "orderflow.wsgi.application"
 
 
