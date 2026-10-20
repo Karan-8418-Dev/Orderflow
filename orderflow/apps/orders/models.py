@@ -7,12 +7,12 @@ from orderflow.apps.catalog.models import Product
 class Order(Basemodel):
     user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True,related_name="order_users")
     status = models.CharField(max_length=20,default="PENDING")
-    total = models.DecimalField(max_digits=10,blank=True)
+    total = models.DecimalField(max_digits=10,blank=True,decimal_places=2)
     
 class OrderItem(Basemodel):
     order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name="order_items")
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name="order_product")
-    quantity = models.PositiveIntegerField(max_length=10,blank=True,null=True)
+    quantity = models.PositiveIntegerField(max_digits=10,blank=True,null=True)
     unit_price = models.DecimalField(blank=True, max_digits=5, decimal_places=2)
     
 class IdempotencyKey(Basemodel):

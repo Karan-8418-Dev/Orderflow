@@ -166,7 +166,7 @@ LOGGING = {
         ,
         "django.db.backends":{
             "handlers":["console"],
-            "level":"Warning",
+            "level":"WARNING",
              "propagate":False,
         },
         "orderflow" : {
