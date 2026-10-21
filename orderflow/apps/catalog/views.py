@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import generics,permissions,viewsets
+from rest_framework import permissions,viewsets
 from orderflow.apps.catalog.serializers import CategorySerializer,PorductSerializer
 from orderflow.apps.catalog.models import Product,Category
 # Create your views here.
