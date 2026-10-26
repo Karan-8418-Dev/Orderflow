@@ -11,3 +11,6 @@ class PaymentHistoryViewset(ReadOnlyModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentHistorySerializer
     permission_classes=[permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        return Payment.objects.filter(order__user=self.request.user)

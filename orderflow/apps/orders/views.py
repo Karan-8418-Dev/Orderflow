@@ -10,7 +10,7 @@ from orderflow.apps.orders.serializers import OrderSerializer,OrderItemSerialize
 class OrderViewset(ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OrderSerializer
-    http_method_names = ["get", "post"]
+    http_method_names = ["get", "post","patch","delete"]
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
 
@@ -19,7 +19,7 @@ class OrderViewset(ModelViewSet):
 class OrderItemViewset(ReadOnlyModelViewSet):
     serializer_class = OrderItemSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ["get", "patch", "delete", "head", "options"]
+    http_method_names = ["get"]
     
     def get_queryset(self):
         return OrderItem.objects.filter(order__user=self.request.user)

@@ -12,7 +12,7 @@ class Order(Basemodel):
 class OrderItem(Basemodel):
     order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name="order_items")
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name="order_product")
-    quantity = models.PositiveIntegerField(max_digits=10,blank=True,null=True)
+    quantity = models.PositiveIntegerField(default=1)
     unit_price = models.DecimalField(blank=True, max_digits=5, decimal_places=2)
     
 class IdempotencyKey(Basemodel):

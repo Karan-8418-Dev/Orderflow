@@ -12,7 +12,7 @@ class Categoryviewset(viewsets.ModelViewSet):
     
 class Productviewset(viewsets.ModelViewSet):
     queryset = Product.objects.all()
-    serializer_class = Category
+    serializer_class = PorductSerializer
     permission_classes= [permissions.IsAuthenticatedOrReadOnly]
     filterset_fields = ["category","is_active"]
     search_fields = ["name"]

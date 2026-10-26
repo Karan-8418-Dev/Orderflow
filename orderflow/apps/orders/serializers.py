@@ -61,7 +61,7 @@ class OrderUpdateSerializer(serializers.ModelSerializer):
         order =instance.order
         total =sum((item.quantity * item.unit_price for item in order.order_items.all()),start=0)
         order.total = total
-        order.save(update_fields=["totals"])
+        order.save(update_fields=["total"])
         return instance
         
     
