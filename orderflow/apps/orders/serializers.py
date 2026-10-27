@@ -9,7 +9,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model =  OrderItem
         fields = "__all__"
-        read_only_fields = ("id","created_at","updated_at","unit_price")
+        read_only_fields = ("id","created_at","updated_at","unit_price","order")
         
 class OrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many =True,required=True)
@@ -54,7 +54,7 @@ class OrderUpdateSerializer(serializers.ModelSerializer):
         
     def validate(self, attrs):
         if self.instance.order.status != "PENDING":
-          raise ValidationError("The Pending Order cannot be modified") 
+          raise ValidationError("Only Pending Order can be modified") 
         return attrs
     def update(self, instance, validated_data):
         instance =  super().update(instance, validated_data)

@@ -2,7 +2,8 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework import permissions
 from orderflow.apps.orders.models import Order,OrderItem
-from rest_framework.viewsets import ModelViewSet,ReadOnlyModelViewSet
+from rest_framework.viewsets import ModelViewSet,GenericViewSet
+from rest_framework.mixins import UpdateModelMixin
 from rest_framework.exceptions import ValidationError
 from orderflow.apps.orders.serializers import OrderSerializer,OrderItemSerializer,OrderUpdateSerializer
 
@@ -16,16 +17,9 @@ class OrderViewset(ModelViewSet):
 
     
 
-class OrderItemViewset(ReadOnlyModelViewSet):
-    serializer_class = OrderItemSerializer
+class OrderItemViewset(GenericViewSet,UpdateModelMixin):
+    serializer_class = OrderUpdateSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ["get"]
     
     def get_queryset(self):
         return OrderItem.objects.filter(order__user=self.request.user)
-    
-    def get_serializer_class(self):
-        if self.action == "partial_update":
-            return OrderUpdateSerializer
-        return OrderUpdateSerializer
-    
