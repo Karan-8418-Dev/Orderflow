@@ -10,4 +10,4 @@ class OrderStatus(BaseChoices):
     CANCELLED = "Cancelled"
     
     
-ORDER_CHOICES = OrderStatus.choices()
+ORDER_CHOICES = OrderStatus.choices

@@ -8,9 +8,9 @@ from orderflow.apps.core.models import Adress
 class Order(Basemodel):
     user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True,related_name="order_users")
     status = models.CharField(max_length=20,choices=ORDER_CHOICES,default="PENDING")
-    total = models.DecimalField(max_digits=10,blank=True,decimal_places=2)
-    billing_adress = models.ForeignKey(Adress,blank=True,null=True,on_delete=models.SET_NULL,related_name ="order_adress")
-    shipping_adress = models.ForeignKey(Adress,blank=True,null=True,on_delete=models.SET_NULL,related_name ="order_adress")
+    total = models.DecimalField(max_digits=10,blank=True,default=0,decimal_places=2)
+    billing_adress = models.ForeignKey(Adress,blank=True,null=True,on_delete=models.SET_NULL,related_name ="order_bill_adress")
+    shipping_adress = models.ForeignKey(Adress,blank=True,null=True,on_delete=models.SET_NULL,related_name ="order_ship_adress")
     
 class OrderItem(Basemodel):
     order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name="order_items")

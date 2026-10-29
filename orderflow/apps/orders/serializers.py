@@ -2,6 +2,8 @@ from rest_framework import serializers
 from orderflow.apps.orders.models import Order,OrderItem
 from orderflow.apps.catalog.models import Product 
 from rest_framework.serializers import ValidationError
+from django.db import transaction
+from django.db.models import F
 
 
 
@@ -25,22 +27,28 @@ class OrderSerializer(serializers.ModelSerializer):
         return attrs
     def create(self, validated_data):
         item_data = validated_data.pop("order_items")
-        order = Order.objects.create(user=self.context["request"].user,**validated_data)
-        total = 0
-        for item in item_data:
-            product = item["product"]
-            quantity = item["quantity"]
-            unit_price = product.price
-            OrderItem.objects.create(
-                order =order,
-                product = product,
-                quantity = quantity,
-                unit_price =unit_price ,
-            )
-            total += quantity * unit_price
-        order.total = total
-        order.save()
-        return order
+        user = self.context["request"].user
+        with transaction.atomic():
+        
+            order = Order.objects.create(user=self.context["request"].user,**validated_data)
+            total = 0
+            for item in item_data:
+                product_instance = item["product"]
+                quantity = item["quantity"] 
+                product = Product.objects.select_for_update().get(id=product_instance.id)
+                if product.stock < quantity:
+                    raise ValidationError({"details":f"Insufficient stock for '{product.name}',Available '{product.stock},Request ]"})
+                Product.objects.filter(id=product.id).update(stock = F("stock")-quantity)
+                OrderItem.objects.create(
+                    order =order,
+                    product = product,
+                    quantity = quantity,
+                    unit_price =product.price ,
+                )
+                total += quantity * product.price
+            order.total = total
+            order.save(update_fields=["total"])
+            return order
         
 class OrderUpdateSerializer(serializers.ModelSerializer):
     class Meta:
