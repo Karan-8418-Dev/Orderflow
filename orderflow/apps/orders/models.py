@@ -3,7 +3,9 @@ from orderflow.apps.core.models import Basemodel
 from orderflow.apps.users.models import User
 from orderflow.apps.catalog.models import Product
 from orderflow.apps.orders.constant import ORDER_CHOICES
+from orderflow.apps.orders.constant import IdemPotencyKeysStatus,IDEMPOTENCY_STATUS_CHOICES
 from orderflow.apps.core.models import Adress
+from django.db.models import UniqueConstraint,Index
 # Create your models here.
 class Order(Basemodel):
     user = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True,related_name="order_users")
@@ -19,9 +21,21 @@ class OrderItem(Basemodel):
     unit_price = models.DecimalField(blank=True, max_digits=10, decimal_places=2)
     
 class IdempotencyKey(Basemodel):
+    user = models.ForeignKey(User,null=True,on_delete=models.CASCADE,related_name= "idempotency_keys")
     key = models.CharField(max_length=255,blank= True)
-    request_hash = models.TextField(blank= True)
-    response = models.TextField(blank= True)
+    request_path= models.TextField(blank= True,max_length=255)
+    request_hash = models.TextField(blank= True,max_length=64)
+    status = models.CharField(max_length=20,choices=IDEMPOTENCY_STATUS_CHOICES,default=IdemPotencyKeysStatus.STARTED.name)
+    response = models.JSONField(null=True,blank= True)
+    response_code = models.PositiveIntegerField(null=True,blank=True)
+    
+    class Meta: 
+        constraints =[
+            UniqueConstraint(fields=["user", "key"], name="unique_idempotency")
+        ]
+        indexes=[
+            Index(fields=["user","key"])
+        ]
     
     
 class OutboxEvent(Basemodel):

@@ -20,7 +20,7 @@ class OrderViewset(ModelViewSet):
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
 
-    @action(details=True,methods=["POST"],url_path ="cancel")
+    @action(detail=True,methods=["POST"],url_path ="cancel")
     def cancel(self,request,pk=None):
         order =self.get_object()
         
@@ -29,9 +29,9 @@ class OrderViewset(ModelViewSet):
         
         with transaction.atomic():
             for item in order.order_items.all():
-                Product.objects.filters(id = item.product).update(stock =F("stock")+ item.quantity)
+                Product.objects.filter(id = item.product).update(stock =F("stock")+ item.quantity)
             order.status = "CANCELLED"
-            order.save(updated_fields =["status"])
+            order.save(update_fields =["status"])
             
         return Response({"message":"Products Cancelled Successfuly","status":order.status},status=status.HTTP_202_ACCEPTED)
             
