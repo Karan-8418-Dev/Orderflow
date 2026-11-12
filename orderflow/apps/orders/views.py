@@ -12,13 +12,18 @@ from rest_framework import status
 from django.db import transaction
 from django.db.models import F
 from orderflow.apps.catalog.models import Product
+from orderflow.apps.orders.serializers import OrderItemDetailSerializer
 
 class OrderViewset(ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = OrderSerializer
     http_method_names = ["get", "post","patch","delete"]
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        return Order.objects.filter(user=self.request.user).prefetch_related("order_items__product").select_related("billing_adress","shipping_adress","user")
+    
+    def  get_serializer_class(self):
+        if self.action in ["list","retrieve"]:
+            return OrderItemDetailSerializer
+        return OrderSerializer
 
     @action(detail=True,methods=["POST"],url_path ="cancel")
     def cancel(self,request,pk=None):
@@ -29,7 +34,7 @@ class OrderViewset(ModelViewSet):
         
         with transaction.atomic():
             for item in order.order_items.all():
-                Product.objects.filter(id = item.product).update(stock =F("stock")+ item.quantity)
+                Product.objects.filter(id = item.product_id).update(stock =F("stock")+ item.quantity)
             order.status = "CANCELLED"
             order.save(update_fields =["status"])
             

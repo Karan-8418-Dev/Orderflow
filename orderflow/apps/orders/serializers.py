@@ -4,6 +4,8 @@ from orderflow.apps.catalog.models import Product
 from rest_framework.serializers import ValidationError
 from django.db import transaction
 from django.db.models import F
+from orderflow.apps.catalog.serializers import PorductSerializer
+from orderflow.apps.users.serializers import UserRelatedSerializer
 
 
 
@@ -12,6 +14,21 @@ class OrderItemSerializer(serializers.ModelSerializer):
         model =  OrderItem
         fields = "__all__"
         read_only_fields = ("id","created_at","updated_at","unit_price","order")
+        
+class OrderItemDetailSerializer(serializers.ModelSerializer):
+    product = PorductSerializer(read_only=True,required = False)
+    class Meta:
+        model = OrderItem
+        fields =("id","product","quantity","unit_price","created_at")
+    
+
+class OrderDetailSerializer(serializers.ModelSerializer):
+    order_items = OrderItemDetailSerializer(read_only=True,required = False)
+    user = UserRelatedSerializer(read_only=True,required = False)
+    class Meta:
+        model:Order
+        fields = ("id","order_items","status","total","billing_adress","shipping_adress","user")
+    
         
 class OrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many =True,required=True)

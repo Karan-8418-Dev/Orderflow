@@ -1,6 +1,11 @@
 from rest_framework import serializers
 from orderflow.apps.users.models import User
 
+class UserRelatedSerializer(serializers.ModelSerializer):
+    class Meta : 
+        model = User
+        fields = ("id","first_name","last_name")
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True,min_length = 8)
     class Meta:
